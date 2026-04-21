@@ -150,3 +150,51 @@ curl -s "https://api.utage-system.com/v1/funnels" \
 ## Step 4: 動作確認
 
 ルートの SKILL.md を読み込んで「UTAGEのファネル一覧を取得して」と指示してみてください。
+
+---
+
+## 補足: curlでMCPサーバーを直接叩く方法
+
+AIツールのMCPクライアントがうまく動作しない場合でも、`curl` でMCPサーバーを直接叩けば同等の操作が可能です。
+
+### 疎通確認（initialize）
+
+```bash
+source .env
+curl -s -X POST "https://api.utage-system.com/mcp" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"curl","version":"1.0"}}}' \
+  | grep "^data:" | sed 's/^data: //' | python3 -m json.tool
+```
+
+`serverInfo.name: "utage-api"` が返ればOK。
+
+### ツール一覧取得（tools/list）
+
+```bash
+source .env
+curl -s -X POST "https://api.utage-system.com/mcp" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' \
+  | grep "^data:" | sed 's/^data: //' \
+  | python3 -c "import json,sys; [print(t['name']) for t in json.load(sys.stdin)['result']['tools']]"
+```
+
+### ツール実行（tools/call）
+
+```bash
+source .env
+curl -s -X POST "https://api.utage-system.com/mcp" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"funnel_list","arguments":{}}}' \
+  | grep "^data:" | sed 's/^data: //' | python3 -m json.tool
+```
+
+> 💡 `name` を変えれば全54ツールをcurlから実行できます（例: `message_account_list`, `message_scenario_list` 等）  
+> 💡 引数が必要なツールは `"arguments": {"account_id": "xxx"}` のように指定
