@@ -2,11 +2,36 @@
 
 ステップメール・LINE配信の作成・編集・削除を行います。
 
+## MCPツール
+
+| ツール名 | 操作 |
+|:---|:---|
+| `message_list` | メッセージ一覧取得 |
+| `message_get` | メッセージ詳細取得 |
+| `message_create` | メッセージ作成 |
+| `message_update` | メッセージ更新（PUT: 全フィールド必須） |
+| `message_delete` | メッセージ削除 |
+| `message_test_send` | テスト送信 |
+| `message_stats_get` | 配信統計取得 |
+
 ---
 
-## メッセージ作成（ステップメール）
+## ⚠️ 注意点
 
-### 必須パラメータ（省略するとvalidation_error）
+> → 全カテゴリ共通トラップはルートの SKILL.md を参照
+
+### メッセージ固有の注意
+
+- **`send_type` は必須**。省略すると `validation_error`。値は `"scheduled"` or `"immediately"`
+- **`send_type: "immediately"` のステップは API 経由で公開不可**。管理画面から手動公開するか、`send_date: 0` で代替
+- **PUT は全フィールド必須**。未指定フィールドは null にリセットされる。必ず `message_get` で現在値を取得してから、変更箇所だけ書き換えて送信すること
+- **メール本文には配信解除URL（`%cancel%` or `%cancelall%`）を必ず含める**こと。含めないとバリデーションエラー
+
+---
+
+## メッセージ作成の必須パラメータ
+
+### ステップメール（channel: mail）
 
 ```json
 {
@@ -18,90 +43,18 @@
   "send_date": 2,
   "send_hour": 18,
   "send_min": 0,
-  "title": "件名",
+  "title": "管理名",
   "mail": {
     "type": "plain_text",
     "from_mail": "info@example.com",
     "from_name": "送信者名",
     "subject": "件名",
-    "text": "本文"
+    "text": "本文\n\n配信解除: %cancel%"
   }
 }
 ```
 
-### send_type の値
-
-| 値 | 意味 | 追加パラメータ |
-|:---|:---|:---|
-| `"immediately"` | 登録直後に送信 | 不要（send_date等は無視） |
-| `"scheduled"` | 指定日時に送信 | `send_date`（日数）+ `send_hour` + `send_min` |
-
-> ⚠️ `send_type: "immediately"` のステップはAPI経由での公開（reserved化）が不可。管理画面から手動公開すること。
-
-### curl サンプル
-
-```bash
-# ステップメール作成
-curl -s -X POST "https://api.utage-system.com/v1/messages" \
-  -H "Authorization: Bearer $UTAGE_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data-binary @- << 'EOF'
-{
-  "account_id": "YOUR_ACCOUNT_ID",
-  "scenario_id": "YOUR_SCENARIO_ID",
-  "channel": "mail",
-  "type": "step",
-  "send_type": "scheduled",
-  "send_date": 1,
-  "send_hour": 18,
-  "send_min": 0,
-  "title": "2通目：翌日18時",
-  "mail": {
-    "type": "plain_text",
-    "from_mail": "info@example.com",
-    "from_name": "送信者名",
-    "subject": "件名",
-    "text": "本文テキスト"
-  }
-}
-EOF
-```
-
----
-
-## メッセージ一覧取得
-
-```bash
-curl -s "https://api.utage-system.com/v1/messages?account_id=ACCOUNT_ID&scenario_id=SCENARIO_ID" \
-  -H "Authorization: Bearer $UTAGE_API_KEY"
-```
-
----
-
-## メッセージ更新（PUT）
-
-> ⚠️ PUT は全フィールド必須。未指定フィールドは null にリセットされる。  
-> 必ず GET で現在値を取得してから、変更箇所だけ書き換えて送信すること。
-
-```bash
-curl -s -X PUT "https://api.utage-system.com/v1/messages/MESSAGE_ID" \
-  -H "Authorization: Bearer $UTAGE_API_KEY" \
-  -H "Content-Type: application/json" \
-  --data-binary @payload.json
-```
-
----
-
-## メッセージ削除
-
-```bash
-curl -s -X DELETE "https://api.utage-system.com/v1/messages/MESSAGE_ID" \
-  -H "Authorization: Bearer $UTAGE_API_KEY"
-```
-
----
-
-## LINE配信（channel: line）
+### LINE配信（channel: line）
 
 ```json
 {
@@ -125,6 +78,13 @@ curl -s -X DELETE "https://api.utage-system.com/v1/messages/MESSAGE_ID" \
 }
 ```
 
+### send_type の値
+
+| 値 | 意味 | 追加パラメータ |
+|:---|:---|:---|
+| `"immediately"` | 登録直後に送信 | 不要（send_date等は無視） |
+| `"scheduled"` | 指定日時に送信 | `send_date`（日数）+ `send_hour` + `send_min` |
+
 ---
 
 ## MDファイルからの一括投入パターン
@@ -147,6 +107,34 @@ from_name: 送信者名
 subject: 【Day2】件名
 ---
 本文テキストをここに書く
+
+配信解除: %cancel%
 ```
 
-AIはこのMDを読み取り、フロントマターをAPIパラメータに変換して送信する。
+AIはこのMDを読み取り、フロントマターをAPIパラメータに変換して `message_create` ツールで送信する。
+
+---
+
+## 補足: REST API（curl）
+
+```bash
+# メッセージ一覧取得
+curl -s "https://api.utage-system.com/v1/messages?account_id=ACCOUNT_ID&scenario_id=SCENARIO_ID" \
+  -H "Authorization: Bearer $UTAGE_API_KEY"
+
+# メッセージ作成
+curl -s -X POST "https://api.utage-system.com/v1/messages" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data-binary @payload.json
+
+# メッセージ更新（PUT: 全フィールド必須）
+curl -s -X PUT "https://api.utage-system.com/v1/messages/MESSAGE_ID" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data-binary @payload.json
+
+# メッセージ削除
+curl -s -X DELETE "https://api.utage-system.com/v1/messages/MESSAGE_ID" \
+  -H "Authorization: Bearer $UTAGE_API_KEY"
+```

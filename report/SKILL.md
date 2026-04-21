@@ -17,6 +17,8 @@ AIが以下を自動実行します:
 3. GitHub Discussions に投稿
 4. 投稿URLを返す
 
+> ⚠️ `report_discussion.py` は `GITHUB_TOKEN` が必要です。MCPのみでセットアップした場合は `.env` に `GITHUB_TOKEN` を追加するか、下記の手動投稿をご利用ください。
+
 ---
 
 ## 手動投稿
@@ -24,9 +26,9 @@ AIが以下を自動実行します:
 GitHub Token を持っていない場合は直接投稿:
 https://github.com/icloudaichi/utage-skill/discussions/new
 
-カテゴリ: 
+カテゴリ:
 - `Bug` → APIの動作が仕様と異なる
-- `Ideas` → skill.mdに追加すべき知見
+- `Ideas` → SKILL.mdに追加すべき知見
 - `Q&A` → 動作不明・要検証
 
 ---
@@ -34,7 +36,7 @@ https://github.com/icloudaichi/utage-skill/discussions/new
 ## report_discussion.py 使い方
 
 ```bash
-source .env
+export GITHUB_TOKEN="your_token_here"
 python3 report/report_discussion.py \
   --title "image_srcで画像が保存されない" \
   --body "image要素にimage_srcを使ったが保存されなかった。image_urlが正しい。" \

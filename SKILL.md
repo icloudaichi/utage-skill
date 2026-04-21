@@ -1,25 +1,25 @@
 ---
 name: utage-skill
 description: >
-  UTAGEをAI（MCP + REST API）で操作するための実機検証済みスキル。
-  公開情報をもとに検証した知見をOSSとして共有します。
-  エラー・発見はGitHub Discussionsで報告してください。
+  UTAGEのMCPサーバーを安全に使うためのコミュニティ知見ベース。
+  実機検証で発見したサイレント失敗・プロパティ名の罠を回避し、
+  AIでUTAGE操作を自動化します。
 requires:
-  - .env（UTAGE_API_KEY設定済み）
-  - UTAGEのMCPサーバー接続
+  - UTAGEのMCPサーバー接続（setup/SKILL.md を参照）
 ---
 
 # UTAGE AI Skill
 
-> 公開情報をもとに実機検証した知見のオープンスキルです。  
-> 「UTAGEの操作ナレッジは、みんなで育てた方が速い」という思想で公開しています。  
+> MCPサーバーに接続すればツール定義は手に入る。  
+> しかしサイレント失敗やプロパティ名の罠は、踏んだ人にしかわからない。  
+> このスキルはその知見を集めて、全員が同じ穴に落ちないようにするプロジェクトです。  
 > エラー・新発見はぜひ [GitHub Discussions](https://github.com/icloudaichi/utage-skill/discussions) へ。
 
 ---
 
 ## 初回セットアップ
 
-`.env` が未設定の場合は先にセットアップを完了してください:
+MCPサーバーに未接続の場合は先にセットアップを完了してください:
 
 ```
 setup/ フォルダの SKILL.md を参照してください
@@ -31,34 +31,14 @@ setup/ フォルダの SKILL.md を参照してください
 
 目的に応じて対応するサブスキルを読み込んでください:
 
-| カテゴリ | 参照先 | 内容 |
+| カテゴリ | 参照先 | MCPツール例 |
 |:---|:---|:---|
-| ステップメール・LINE配信 | `messages/SKILL.md` | 作成・編集・削除・一括投入 |
-| ファネル・LP・ページ要素 | `funnels/SKILL.md` | ファネルCRUD・要素タイプ一覧 |
-| シナリオ管理 | `scenarios/SKILL.md` | シナリオCRUD |
-| 配信アカウント | `accounts/SKILL.md` | アカウントCRUD |
-| メディア参照 | `media/SKILL.md` | 画像・動画URLの確認 |
-| エラー報告・フィードバック | `report/SKILL.md` | GitHub Discussionsへ投稿 |
-
----
-
-## 共通設定の読み方
-
-`.env` から以下を読み込んでください:
-
-```bash
-source .env
-# UTAGE_API_KEY が設定されていることを確認
-echo $UTAGE_API_KEY
-```
-
-API呼び出し共通ヘッダー:
-```bash
--H "Authorization: Bearer $UTAGE_API_KEY" \
--H "Content-Type: application/json"
-```
-
-ベースURL: `https://api.utage-system.com/v1`
+| ステップメール・LINE配信 | `messages/SKILL.md` | `message_create`, `message_update` |
+| ファネル・LP・ページ要素 | `funnels/SKILL.md` | `funnel_page_create`, `element_types_funnel` |
+| シナリオ管理 | `scenarios/SKILL.md` | `message_scenario_create` |
+| 配信アカウント・ラベル・読者 | `accounts/SKILL.md` | `message_account_list`, `message_label_create` |
+| メディア参照 | `media/SKILL.md` | `media_video_list` |
+| エラー報告・フィードバック | `report/SKILL.md` | `report_discussion.py` |
 
 ---
 
@@ -104,7 +84,7 @@ API呼び出し共通ヘッダー:
 ## このスキルについて
 
 - **ライセンス**: MIT（スクリプト）/ CC BY 4.0（ドキュメント）
-- **対象API**: UTAGE 公式 MCP + REST API v1 のみ
+- **対象**: UTAGE 公式 MCPサーバー + REST API v1
 - **メンテナー**: [@icloudaichi](https://github.com/icloudaichi)
-- **バージョン**: 0.1.0（2026-04-21）
+- **バージョン**: 0.2.0（2026-04-21）
 - **フィードバック**: [GitHub Discussions](https://github.com/icloudaichi/utage-skill/discussions)

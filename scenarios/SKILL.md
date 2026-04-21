@@ -2,85 +2,47 @@
 
 配信アカウント配下のシナリオを管理します。
 
----
+## MCPツール
 
-## ⚠️ 重要: フィールド名のトラップ
-
-シナリオ作成のフィールド名は `name` ではなく **`title`**。
-`name` を使うとエラーなく成功するが、タイトルが空になる（サイレント失敗）。
-
----
-
-## シナリオ一覧取得
-
-```bash
-curl -s "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios" \
-  -H "Authorization: Bearer $UTAGE_API_KEY"
-
-# タイトルで検索
-curl -s "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios?title=テスト" \
-  -H "Authorization: Bearer $UTAGE_API_KEY"
-```
+| ツール名 | 操作 |
+|:---|:---|
+| `message_scenario_list` | シナリオ一覧取得（title で検索可） |
+| `message_scenario_create` | シナリオ作成 |
 
 ---
 
-## シナリオ作成
+## ⚠️ 注意点
 
-```bash
-curl -s -X POST "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios" \
-  -H "Authorization: Bearer $UTAGE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "プロモーションシナリオ",
-    "open_title": "公開タイトル（省略時はtitleを使用）"
-  }'
-```
+> → 全カテゴリ共通トラップはルートの SKILL.md を参照
+
+- **フィールド名は `title`**（`name` ではない）。`name` を使うとエラーなく成功するが、タイトルが空になるサイレント失敗
 
 | パラメータ | 必須 | 説明 |
 |:---|:---|:---|
+| `account_id` | ✅ | 配信アカウントID |
 | `title` | ✅ | シナリオタイトル（`name` は NG） |
 | `open_title` | - | 公開タイトル（読者に見える名前） |
 
 ---
 
-## シナリオ更新
+## 実践フロー
 
-```bash
-curl -s -X PUT "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios/SCENARIO_ID" \
-  -H "Authorization: Bearer $UTAGE_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "新しいタイトル"}'
-```
+1. `message_scenario_create` でシナリオ作成
+2. 返された `scenario_id` で `message_create` でメッセージ一括投入
+→ `messages/SKILL.md` を参照
 
 ---
 
-## シナリオ削除
+## 補足: REST API（curl）
 
 ```bash
-curl -s -X DELETE "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios/SCENARIO_ID" \
+# 一覧取得
+curl -s "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios" \
   -H "Authorization: Bearer $UTAGE_API_KEY"
-```
 
----
-
-## 実践フロー（プロモーション一括構築）
-
-```bash
-# 1. シナリオ作成
-SCENARIO=$(curl -s -X POST "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios" \
+# 作成
+curl -s -X POST "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/scenarios" \
   -H "Authorization: Bearer $UTAGE_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"title": "春のプロモーション2026"}')
-SCENARIO_ID=$(echo $SCENARIO | python3 -c "import sys,json; print(json.load(sys.stdin)['data']['id'])")
-
-# 2. シナリオIDを使ってメッセージを一括投入
-# → messages/SKILL.md を参照
-```
-
----
-
-## MCPツール（同等操作）
-
-```
-message_scenario_list / message_scenario_create
+  -d '{"title": "プロモーションシナリオ"}'
 ```
