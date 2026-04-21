@@ -16,12 +16,14 @@ from datetime import datetime
 
 REPO_OWNER = "icloudaichi"
 REPO_NAME = "utage-skill"
+REPO_ID = "R_kgDOSISvZg"
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
 CATEGORIES = {
-    "Bug": "DIC_kwDO...",        # GitHub repo作成後に実IDを設定
-    "Ideas": "DIC_kwDO...",
-    "General": "DIC_kwDO...",
+    "Bug": "DIC_kwDOSISvZs4C7VAU",       # General（バグ報告はGeneralに集約）
+    "Ideas": "DIC_kwDOSISvZs4C7VAW",     # Ideas
+    "General": "DIC_kwDOSISvZs4C7VAU",   # General
+    "Q&A": "DIC_kwDOSISvZs4C7VAV",       # Q&A
 }
 
 BODY_TEMPLATE = """{body}
