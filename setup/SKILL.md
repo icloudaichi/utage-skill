@@ -1,50 +1,26 @@
-# UTAGE AI Skill - セットアップ
+# UTAGE MCP Guide - セットアップ
 
-初回利用時に実行してください。
+VS Codeフォーク系IDE（Cursor・Antigravity・Windsurf等）でUTAGE MCPサーバーに接続するためのガイドです。
 
-> **更新メモ（2026-04-21）**: MCP経由でIDEの全ツールが動作することを確認。MCPセットアップをデフォルトに変更し、.env / REST APIは任意の補足扱いに整理しました。
+> **Claude（Claude Code / claude.ai）をお使いの方へ**  
+> Claudeは公式でUTAGE MCPに対応しています。  
+> → 公式ドキュメント: [docs.utage-system.com](https://docs.utage-system.com)  
+> このガイドの落とし穴集（ルートの SKILL.md）は Claude でもそのまま活用できます。
 
 ---
 
-## Step 1: MCPサーバーを設定する（推奨）
+## Step 1: MCPサーバーを設定する
 
-UTAGEのMCPサーバーに接続することで、IDEのAIツールから全操作が可能になります。  
-**`.env` や APIキー設定は不要です。**
+VS Codeフォーク系IDEはOAuthブラウザフローを直接サポートしないため、`mcp-remote` をプロキシとして使用します。  
+**前提**: Node.js v18以上（npx）がインストール済みであること
 
 使用するIDEに合わせて、以下の設定ファイルに追記してください。
 
 | IDE | 設定ファイル |
 |:---|:---|
-| Claude Code | `.mcp.json`（プロジェクトルート） |
-| claude.ai（ブラウザ） | 画面のUI操作 |
 | Cursor | `~/.cursor/mcp.json` |
 | Antigravity | `~/.gemini/antigravity/mcp_config.json` |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` |
-
----
-
-### Claude Code
-
-```json
-{
-  "mcpServers": {
-    "utage-api": {
-      "url": "https://api.utage-system.com/mcp"
-    }
-  }
-}
-```
-
-### claude.ai（ブラウザ版）
-
-1. 画面左下 **カスタマイズ** → **コネクター** → **+** → **カスタムコネクターを追加**
-2. URL に `https://api.utage-system.com/mcp` を入力
-3. UTAGEのログイン/認可画面で認証
-
-### Cursor / Antigravity / Windsurf（VS Codeフォーク系）
-
-VS Codeフォーク系IDEはOAuthブラウザフローを直接サポートしないため、`mcp-remote` をプロキシとして使用します。  
-**前提**: Node.js v18以上（npx）がインストール済みであること
 
 ```json
 {
