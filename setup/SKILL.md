@@ -34,19 +34,26 @@ curl -s "https://api.utage-system.com/v1/funnels" \
 
 このスキルは **2つの動作モード** があります。
 
-| モード | 対応ツール | 認証方法 |
+| モード | 対応確認済みツール | 認証方法 |
 |:---|:---|:---|
-| **MCP接続** | Claude Code / claude.ai | OAuth（ブラウザ認証） |
-| **REST API直接** | Cursor / Antigravity / その他 | UTAGE_API_KEY（.env） |
+| **MCP接続** | Claude Code / claude.ai / Antigravity | OAuth（ブラウザ認証） |
+| **REST API直接** | 全ツール共通（MCP不要） | UTAGE_API_KEY（.env） |
+
+> ⚠️ **Cursor**: 2026-04時点でOAuth認証フローが不安定。接続できない場合はREST API方式を使用。
 
 ---
 
-### モードA: MCP接続（Claude Code / claude.ai）
+### モードA: MCP接続
 
 UTAGEのMCPサーバーURL:
 ```
 https://api.utage-system.com/mcp
 ```
+
+初回接続時にブラウザでUTAGEのOAuth認証（ログイン＋認可）が必要です。  
+認証が完了すると UTAGE管理画面 > API設定 に「〇〇 MCP接続」としてキーが作成されます。
+
+> ⚠️ OAuthトークンには有効期限があります。接続が切れた場合は再認証が必要です。
 
 **Claude Code（`.mcp.json`）**:
 ```json
@@ -64,16 +71,16 @@ https://api.utage-system.com/mcp
 2. URL に `https://api.utage-system.com/mcp` を入力
 3. UTAGEのログイン/認可画面で認証
 
+**Antigravity**:  
+Antigravityのツール設定でMCPサーバーURLを追加してください。  
+OAuth認証後、`message_account_list` 等のMCPツールが利用可能になります。
+
 ---
 
-### モードB: REST API直接利用（Cursor / Antigravity 推奨）
+### モードB: REST API直接利用（全ツール共通・MCP不要）
 
-> ⚠️ **Cursorでは現時点（2026-04）でUTAGE MCPのOAuth認証が動作しません。**  
-> Streamable HTTP MCP + OAuth のフローがCursorの実装と噛み合わない既知の問題です。  
-> **REST API方式（UTAGE_API_KEY）を使ってください。**
-
-`.env` に `UTAGE_API_KEY` を設定済みであれば、追加設定は不要です。  
-AIが各 `SKILL.md` のcurlサンプルを参照して直接REST APIを呼び出します。
+`.env` に `UTAGE_API_KEY` を設定するだけで使えます。  
+MCP接続の有無に関わらず、すべての操作がREST APIで代替可能です。
 
 ```bash
 # 動作確認
