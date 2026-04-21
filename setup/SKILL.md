@@ -36,10 +36,12 @@ curl -s "https://api.utage-system.com/v1/funnels" \
 
 | モード | 対応確認済みツール | 認証方法 |
 |:---|:---|:---|
-| **MCP接続** | Claude Code / claude.ai / Antigravity | OAuth（ブラウザ認証） |
+| **MCP接続** | Claude Code / claude.ai | OAuth（ブラウザ認証） |
+| **MCP接続** | **Antigravity** | **APIキー（Bearer、mcp_config.json）** |
 | **REST API直接** | 全ツール共通（MCP不要） | UTAGE_API_KEY（.env） |
 
-> ⚠️ **Cursor**: 2026-04時点でOAuth認証フローが不安定。接続できない場合はREST API方式を使用。
+> ⚠️ **Cursor**: 2026-04時点でOAuth認証フローが不安定。接続できない場合はREST API方式を使用。  
+> ⚠️ **Antigravity**: OAuthフローは機能しないため、必ずAPIキー方式（後述）を使用すること。
 
 ---
 
@@ -71,9 +73,31 @@ https://api.utage-system.com/mcp
 2. URL に `https://api.utage-system.com/mcp` を入力
 3. UTAGEのログイン/認可画面で認証
 
-**Antigravity**:  
-Antigravityのツール設定でMCPサーバーURLを追加してください。  
-OAuth認証後、`message_account_list` 等のMCPツールが利用可能になります。
+**Antigravity（Gemini CLI）**:  
+OAuth不要。APIキーをBearerトークンとして `mcp_config.json` に直接記載します。
+
+設定ファイルのパス:
+```
+~/.gemini/antigravity/mcp_config.json
+```
+
+設定内容（`YOUR_API_KEY` を実際のキーに置き換え）:
+```json
+{
+  "mcpServers": {
+    "utage-api": {
+      "serverUrl": "https://api.utage-system.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+> ⚠️ キー名は `httpUrl` や `url` ではなく **`serverUrl`** を使用すること（Antigravity固有の仕様）  
+> ⚠️ `settings.json` の `mcpServers` セクションではなく `mcp_config.json` に記載すること  
+> ⚠️ 設定後はAntigravityセッションを再起動すること
 
 ---
 
