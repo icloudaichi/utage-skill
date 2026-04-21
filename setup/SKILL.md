@@ -32,17 +32,52 @@ curl -s "https://api.utage-system.com/v1/funnels" \
 
 ## Step 3: MCPサーバー設定（AI CLIツール用）
 
-お使いのAIツールのMCP設定に以下を追加してください:
+UTAGEのMCPサーバーは **URLベースの接続**（Streamable HTTP）です。
+`npx` コマンドは不要です。
+
+### 接続URL
+
+```
+https://api.utage-system.com/mcp
+```
+
+認証は OAuth（UTAGEログイン + 認可画面）が自動で行われます。
+
+---
+
+### Claude Code（`.mcp.json`）
 
 ```json
 {
   "mcpServers": {
-    "utage": {
-      "command": "npx",
-      "args": ["-y", "@utage-system/mcp"],
-      "env": {
-        "UTAGE_API_KEY": "YOUR_API_KEY"
-      }
+    "utage-api": {
+      "url": "https://api.utage-system.com/mcp"
+    }
+  }
+}
+```
+
+ファイルの場所: プロジェクトルートの `.mcp.json`、またはグローバル設定
+
+---
+
+### claude.ai（ブラウザ版）
+
+1. 画面左下 **カスタマイズ** → **コネクター** → **+** → **カスタムコネクターを追加**
+2. URL に `https://api.utage-system.com/mcp` を入力
+3. UTAGEのログイン画面が表示されるので認証・認可
+
+---
+
+### Cursor / Windsurf / その他（URLベース対応ツール）
+
+各ツールのMCP設定でURLを指定:
+
+```json
+{
+  "mcpServers": {
+    "utage-api": {
+      "url": "https://api.utage-system.com/mcp"
     }
   }
 }
@@ -50,8 +85,16 @@ curl -s "https://api.utage-system.com/v1/funnels" \
 
 設定ファイルの場所:
 - Cursor: `~/.cursor/mcp.json`
-- Claude Desktop: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Antigravity: ツール設定を参照
+- Windsurf: `~/.codeium/windsurf/mcp_config.json`
+
+---
+
+### Antigravity（本スキルの想定環境）
+
+MCPサーバーへの接続はAntigravityのMCP設定で行います。  
+URLを `https://api.utage-system.com/mcp` に設定してください。  
+→ 設定後、AIがMCPツール（`funnel_list` 等）を自動で呼び出せるようになります。
+
 
 ---
 
