@@ -33,6 +33,7 @@ setup/ フォルダの SKILL.md を参照してください
 
 | カテゴリ | 参照先 | MCPツール例 |
 |:---|:---|:---|
+| 🛡️ バックアップ | `backup/SKILL.md` | `funnel_list`, `funnel_page_get`, `message_list`, `message_get` |
 | ステップメール・LINE配信 | `messages/SKILL.md` | `message_create`, `message_update` |
 | ファネル・LP・ページ要素 | `funnels/SKILL.md` | `funnel_page_create`, `element_types_funnel` |
 | シナリオ管理 | `scenarios/SKILL.md` | `message_scenario_create` |
