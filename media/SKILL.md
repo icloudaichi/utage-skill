@@ -1,7 +1,7 @@
 # UTAGE AI Skill - media
 
 UTAGE内にアップロードされた通常メディア・動画・音声のURLを取得します。
-通常メディア（画像等）はMCPの署名付きURLフローでアップロード可能です。
+通常メディア（画像等）はREST APIまたはMCPの署名付きURLフローでアップロード可能です。
 動画・音声アップロードは引き続き管理画面または別補助スクリプトで扱います。
 
 ## MCPツール
@@ -33,8 +33,12 @@ UTAGE内にアップロードされた通常メディア・動画・音声のURL
 ## 補足: REST API（curl）
 
 ```bash
-# 通常メディア一覧（REST環境によってはMCP専用）
+# 通常メディア一覧
 curl -s "https://api.utage-system.com/v1/media" \
+  -H "Authorization: Bearer $UTAGE_API_KEY"
+
+# 通常メディアフォルダ一覧
+curl -s "https://api.utage-system.com/v1/media/folders" \
   -H "Authorization: Bearer $UTAGE_API_KEY"
 
 # 動画一覧
@@ -48,12 +52,23 @@ curl -s "https://api.utage-system.com/v1/media/audios" \
 
 ## 通常メディアアップロードの実操作フロー
 
-2026-05-16 に以下のMCPフローで画像アップロードを確認済み。
+2026-05-16 にREST/MCPの両方で画像アップロードを確認済み。
+
+REST API:
+
+1. `POST /media/upload-url` に `filename`, `filetype`, 任意で `folder_id` を送って `media_id` と `presigned_post` を取得
+2. `presigned_post.url` に対して `fields` と `file` を multipart POST
+3. ストレージ側が HTTP 204 を返す
+4. `POST /media/complete` に `{"media_id":"..."}` を送る
+5. `GET /media?keyword=...` で反映を確認
+
+MCP:
 
 1. `media_upload_url(filename, filetype)` で `media_id` と `presigned_post` を取得
 2. `presigned_post.url` に対して `fields` と `file` を multipart POST
-3. ストレージ側が HTTP 204 を返す
-4. `media_complete(media_id)` を呼ぶ
-5. `media_list(keyword)` で反映を確認
+3. `media_complete(media_id)` を呼ぶ
+4. `media_list(keyword)` で反映を確認
+
+`POST /media/{media_id}/complete`, `PUT /media/{media_id}/complete`, `POST /media/upload-complete`, `POST /media/complete-upload` は 404。正しいREST完了通知は `POST /media/complete`。
 
 署名付きURL・署名フィールドは短時間で失効するため、ログやドキュメントへそのまま残さないこと。

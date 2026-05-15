@@ -53,6 +53,20 @@ curl -s -X POST "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/labels" \
   -H "Content-Type: application/json" \
   -d '{"name": "テストラベル"}'
 
+# ラベル詳細
+curl -s "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/labels/LABEL_ID" \
+  -H "Authorization: Bearer $UTAGE_API_KEY"
+
+# ラベル更新
+curl -s -X PUT "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/labels/LABEL_ID" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "更新後ラベル名"}'
+
+# ラベル削除
+curl -s -X DELETE "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/labels/LABEL_ID" \
+  -H "Authorization: Bearer $UTAGE_API_KEY"
+
 # 読者一覧
 curl -s "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/readers" \
   -H "Authorization: Bearer $UTAGE_API_KEY"
@@ -60,5 +74,5 @@ curl -s "https://api.utage-system.com/v1/accounts/ACCOUNT_ID/readers" \
 
 2026-05-16 実操作確認:
 - MCP `message_label_create` / `message_label_list` 成功
-- REST `POST /accounts/{account_id}/labels` / `GET /accounts/{account_id}/labels` 成功
+- REST `POST /accounts/{account_id}/labels` / `GET /accounts/{account_id}/labels` / `GET /accounts/{account_id}/labels/{label_id}` / `PUT /accounts/{account_id}/labels/{label_id}` / `DELETE /accounts/{account_id}/labels/{label_id}` 成功
 - `message_reader_list` の `conditions` は `message_condition_types` と `message_placeholder_list.is_filterable` を確認してから使う
