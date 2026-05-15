@@ -40,6 +40,8 @@
 - **`raw_html` は html/head/body タグ必須**。DOCTYPEは任意、最大4MB
 - **全幅ページ（`pc_width=100`）の背景色**はページの `background_color` で指定する。固定幅ページでは指定すると表示が崩れる場合があります
 - **全幅ページのコンテンツ幅**は `section.content_width` ではなく `row.width` で制御する
+- **ステップ並び替え**は全ステップID必須。ID不足・重複・余分ID・空配列は422
+- **フォーム付きLP**は現行実機では `form` 要素に `scenario_id` と `use_reader_item=1` を指定する方式が安定。`form-name` / `form-email` は未対応
 
 ---
 
@@ -89,6 +91,24 @@ element_types_funnel(include="form")    → フォーム要素も含む
 element_types_funnel_properties(types="text,button,image") → プロパティ定義
 ```
 
+## フォーム付きLPの現行実機パターン
+
+```json
+{
+  "type": "form",
+  "scenario_id": "SCENARIO_ID",
+  "use_reader_item": 1,
+  "label": "show",
+  "required": 1,
+  "content": "登録する",
+  "button_color": "btn-green",
+  "color": "#ffffff"
+}
+```
+
+`form-input` / `form-button` は要素タイプとして存在しますが、通常登録フォームでは `form.children` に入れず、`form` 要素自体にボタン・読者項目利用設定を持たせます。
+公開フォーム送信は `/form/action/{page_id}` で動作しますが、これは公式REST APIではなく公開ページ内部動作です。
+
 ---
 
 ## 補足: REST API（curl）
@@ -107,6 +127,12 @@ curl -s -X POST "https://api.utage-system.com/v1/funnels" \
 # ステップ一覧取得（step_url を含む）
 curl -s "https://api.utage-system.com/v1/funnels/FUNNEL_ID/steps" \
   -H "Authorization: Bearer $UTAGE_API_KEY"
+
+# ステップ並び替え（全ステップID必須）
+curl -s -X PUT "https://api.utage-system.com/v1/funnels/FUNNEL_ID/steps/reorder" \
+  -H "Authorization: Bearer $UTAGE_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"step_ids":["STEP_ID_1","STEP_ID_2","STEP_ID_3"]}'
 
 # ページ作成
 curl -s -X POST \

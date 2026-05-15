@@ -37,6 +37,7 @@
 - **読者絞り込み条件は推測しない**。`message_condition_types` と `message_placeholder_list` の `is_filterable=true` を確認してから使う
 - **アクション配信**（`channel: "action"`）は `message_action_list` で取得した `action_id` を使う。アクション自体の作成は管理画面のみ
 - **LINE送信者更新はPUTセマンティクス**。`message_line_sender_get` で現在値を取得し、`name` と `image_url` の両方を送る
+- **テスト送信**は `message_test_send` を使う。`step` / `reminder` でも即時送信されるため、本番読者宛では使わない
 
 ---
 
@@ -96,6 +97,21 @@
 | `"immediately"` | 登録直後に送信 | 不要（send_date等は無視） |
 | `"scheduled"` | 指定日時に送信 | `send_date`（日数）+ `send_hour` + `send_min` |
 | `"scheduled_addition"` | 追加配信 | 追加配信用の日時・条件 |
+
+### テスト送信
+
+2026-05-16 実操作確認:
+
+```json
+{
+  "tool": "message_test_send",
+  "to": "icloudaichi@gmail.com",
+  "from_mail": "info@hirahara-daichi.com",
+  "result": {"success": true}
+}
+```
+
+テスト送信用のメッセージも、メール本文に `%cancel%` または `%cancelall%` が必要です。
 
 ---
 
